@@ -88,7 +88,7 @@ expense-infra/
 
 ### Application Home
 
-![App Home](docs/screenshots/app-home.png)
+![App Home](docs/screenshots/app-home.PNG)
 
 ---
 
