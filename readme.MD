@@ -90,10 +90,6 @@ expense-infra/
 
 ![App Home](docs/screenshots/app-home.png)
 
-### Backend Service Status
-
-![Backend Status](docs/screenshots/backend-status.png)
-
 ---
 
 ## Prerequisites
