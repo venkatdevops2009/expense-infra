@@ -1,84 +1,125 @@
-# Expense Tracker Infrastructure on AWS using Terraform
+# Expense Tracker Infrastructure on AWS
 
-A 3-tier Expense Tracker deployment on :contentReference[oaicite:0]{index=0} using :contentReference[oaicite:1]{index=1}.
+![Terraform](https://img.shields.io/badge/Terraform-IaC-623CE4?logo=terraform&logoColor=white)
+![AWS](https://img.shields.io/badge/AWS-EC2%20%7C%20Route53-FF9900?logo=amazonaws&logoColor=white)
+![Nginx](https://img.shields.io/badge/Nginx-Frontend-009639?logo=nginx&logoColor=white)
+![Node.js](https://img.shields.io/badge/Node.js-Backend-339933?logo=nodedotjs&logoColor=white)
+![MySQL](https://img.shields.io/badge/MySQL-Database-4479A1?logo=mysql&logoColor=white)
+
+A production-style 3-tier Expense Tracker deployment on AWS using Terraform.
+
+---
 
 ## Architecture
 
 ![Architecture Diagram](docs/architecture.png)
 
-## Overview
+### Flow
 
-This project provisions:
+```text
+User
+  |
+  v
+Route53 DNS
+  |
+  v
+Frontend (Nginx)
+  |
+  v
+Backend (Node.js)
+  |
+  v
+Database (MySQL)
+```
 
-- Frontend server using :contentReference[oaicite:2]{index=2}
-- Backend server using :contentReference[oaicite:3]{index=3}
-- Database server using :contentReference[oaicite:4]{index=4}
-- DNS records using :contentReference[oaicite:5]{index=5}
+---
 
 ## Project Structure
 
 ```text
 expense-infra/
 ├── README.md
-├── main.tf
 ├── provider.tf
 ├── variables.tf
+├── main.tf
 ├── outputs.tf
 ├── terraform.tfvars
 ├── docs/
-│   └── architecture.png
+│   ├── architecture.png
+│   └── screenshots/
+│       ├── app-home.png
+│       └── backend-status.png
 └── scripts/
-    ├── database-setup.sh
+    ├── frontend-setup.sh
     ├── backend-setup.sh
-    └── frontend-setup.sh
+    └── database-setup.sh
 ```
 
-## Application Flow
+---
 
-1. User opens `piridishop.shop`
-2. Frontend serves static app
-3. API calls go to backend `/api/`
-4. Backend talks to database
-5. Data persists in MySQL
+## Features
 
-## Infrastructure
+- Infrastructure as Code using Terraform
+- Automated EC2 provisioning
+- Automated application deployment using user-data
+- Route53 DNS integration
+- Nginx reverse proxy
+- Backend systemd service
+- MySQL database bootstrap
+- Fully reproducible deployment
 
-### Frontend
-- EC2 instance
-- Public access
-- Port 80
-- Reverse proxy to backend
+---
 
-### Backend
-- EC2 instance
-- Private communication
-- Port 8080
-- systemd service
+## AWS Resources Created
 
-### Database
-- EC2 instance
-- MySQL
-- Port 3306
+- 3 EC2 Instances
+- Security Groups
+- Route53 DNS Records
 
-## Security Groups
-
-### frontend-sg
-- 80 from internet
-- 22 from internet
-
-### backend-sg
-- 8080 from frontend-sg
-- 22 from internet
-
-### database-sg
-- 3306 from backend-sg
-- 22 from internet
-
-## DNS
+### DNS Records
 
 - `piridishop.shop`
 - `backend.piridishop.shop`
 - `database.piridishop.shop`
+
+---
+
+## Screenshots
+
+### Application Home
+
+![App Home](docs/screenshots/app-home.png)
+
+### Backend Service Status
+
+![Backend Status](docs/screenshots/backend-status.png)
+
+---
+
+## Prerequisites
+
+Install locally:
+
+- Terraform
+- AWS CLI
+- Git
+- SSH Key Pair
+- AWS Account
+- Route53 Hosted Zone
+
+---
+
+## Terraform Variables
+
+Create `terraform.tfvars`
+
+```hcl
+ami           = "ami-xxxxxxxx"
+instance_type = "t3.micro"
+key_name      = "your-key"
+```
+
+---
 
 ## Deployment
 
@@ -86,6 +127,12 @@ expense-infra/
 
 ```bash
 terraform init
+```
+
+### Validate
+
+```bash
+terraform validate
 ```
 
 ### Plan
@@ -106,14 +153,7 @@ terraform apply
 terraform destroy
 ```
 
-## Variables
-
-`terraform.tfvars`
-
-```hcl
-ami      = "ami-xxxxxxxx"
-key_name = "your-key"
-```
+---
 
 ## Verification
 
@@ -125,6 +165,8 @@ https://piridishop.shop
 
 ### Backend
 
+SSH into backend server:
+
 ```bash
 sudo systemctl status backend
 curl http://localhost:8080/health
@@ -132,30 +174,75 @@ curl http://localhost:8080/health
 
 ### Database
 
+SSH into database server:
+
 ```bash
 mysql -u root -pExpenseApp@1 -e "show databases;"
 ```
 
+---
+
+## Security Group Design
+
+### Frontend SG
+
+| Port | Source |
+|---|---|
+| 80 | Internet |
+| 22 | Internet |
+
+### Backend SG
+
+| Port | Source |
+|---|---|
+| 8080 | Frontend SG |
+| 22 | Internet |
+
+### Database SG
+
+| Port | Source |
+|---|---|
+| 3306 | Backend SG |
+| 22 | Internet |
+
+---
+
 ## Troubleshooting
 
-### Backend not running
+### Backend not reachable
 
 ```bash
+sudo systemctl status backend
 sudo journalctl -u backend -f
 ```
 
-### Port check
+### Port checks
 
 ```bash
 ss -lntp | grep 8080
 ss -lntp | grep 3306
 ```
 
-## Future Improvements
+### Cloud-init logs
 
-- ALB
-- Auto Scaling
-- RDS
-- CI/CD
-- SSL
-- Monitoring
+```bash
+sudo tail -100 /var/log/cloud-init-output.log
+```
+
+---
+
+## Future Enhancements
+
+- Application Load Balancer
+- Auto Scaling Group
+- RDS Migration
+- SSL with ACM
+- CI/CD Pipeline
+- Monitoring with CloudWatch
+- Backup automation
+
+---
+
+## Author
+
+Built as a Terraform + AWS infrastructure automation project for deploying an Expense Tracker application.
