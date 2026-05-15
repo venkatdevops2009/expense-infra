@@ -21,12 +21,6 @@ variable "region" {
   default = "us-east-1"
 }
 
-# Define variable for AWS profile
-variable "aws_profile" {
-  type    = string
-  default = "default"
-}
-
 # Define variable for VPC CIDR block
 variable "vpc_cidr_block" {
   type    = string
